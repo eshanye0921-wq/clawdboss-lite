@@ -35,7 +35,7 @@ The wizard auto-installs Node.js 22, Python, build tools, and OpenClaw. It asks 
 1. Your name and timezone
 2. Agent name, pronouns, emoji
 3. Agent tier (Solo / Team / Squad)
-4. Interface (Discord / NanoFlow Console / Both)
+4. Interface (Discord / ClawSuite Console / Both)
 5. LLM provider and API keys
 6. Optional tools (13 available, each Y/n)
 7. Built-in skills activation

@@ -293,8 +293,8 @@ collect_agent_info() {
   echo -e "${BOLD}--- Interface ---${NC}"
   echo ""
   echo "  1) Discord           — Chat with your agents via Discord bot"
-  echo "  2) NanoFlow Console  — Web dashboard with chat, file browser, terminal, cost analytics"
-  echo "  3) Both              — Discord + NanoFlow Console side by side"
+  echo "  2) ClawSuite Console  — Web dashboard with chat, file browser, terminal, cost analytics"
+  echo "  3) Both              — Discord + ClawSuite Console side by side"
   echo ""
   ask "Choose interface [1/2/3]"
   read -r INTERFACE_CHOICE
@@ -1470,8 +1470,8 @@ show_summary() {
   echo "    2. Check status:         openclaw status"
 
   if [ "$USE_CONSOLE" = true ]; then
-    echo "    3. Start NanoFlow Console:"
-    echo "       cd ~/nanoflow-console && HOST=0.0.0.0 PORT=3000 node server-entry.js"
+    echo "    3. Start ClawSuite Console:"
+    echo "       cd ~/clawsuite && HOST=0.0.0.0 PORT=3000 node server-entry.js"
     echo "       Then open http://localhost:3000"
   fi
 
@@ -1484,7 +1484,7 @@ show_summary() {
     echo "    • Discord bot configured"
   fi
   if [ "$USE_CONSOLE" = true ]; then
-    echo "    • NanoFlow Console installed at ~/nanoflow-console"
+    echo "    • ClawSuite Console installed at ~/clawsuite"
   fi
   echo ""
   echo -e "  ${BOLD}Ecosystem Tools:${NC}"
@@ -1560,23 +1560,23 @@ main() {
   install_marketing_skills
   install_healthcheck
 
-  # Install NanoFlow Console (if selected)
+  # Install ClawSuite Console (if selected)
   if [ "$USE_CONSOLE" = true ]; then
     echo ""
-    echo -e "${BOLD}--- NanoFlow Console ---${NC}"
+    echo -e "${BOLD}--- ClawSuite Console ---${NC}"
     echo ""
-    info "Installing NanoFlow Console web dashboard..."
+    info "Installing ClawSuite Console web dashboard..."
 
-    CONSOLE_DIR="$HOME/nanoflow-console"
+    CONSOLE_DIR="$HOME/clawsuite"
     if [ -d "$CONSOLE_DIR" ]; then
       info "Existing installation found at $CONSOLE_DIR — pulling latest..."
       (cd "$CONSOLE_DIR" && git pull --ff-only 2>/dev/null) || warn "Could not update — using existing version"
     else
-      if git clone --depth 1 https://github.com/NanoFlow-io/nanoflow-console.git "$CONSOLE_DIR" 2>/dev/null; then
-        success "NanoFlow Console cloned to $CONSOLE_DIR"
+      if git clone --depth 1 https://github.com/outsourc-e/clawsuite.git "$CONSOLE_DIR" 2>/dev/null; then
+        success "ClawSuite Console cloned to $CONSOLE_DIR"
       else
-        warn "Could not clone NanoFlow Console. Install manually:"
-        warn "  git clone https://github.com/NanoFlow-io/nanoflow-console.git"
+        warn "Could not clone ClawSuite Console. Install manually:"
+        warn "  git clone https://github.com/outsourc-e/clawsuite.git"
         USE_CONSOLE=false
       fi
     fi
@@ -1586,7 +1586,7 @@ main() {
         && success "Dependencies installed" \
         || warn "npm install failed — run manually in $CONSOLE_DIR"
 
-      # Create .env for NanoFlow Console
+      # Create .env for ClawSuite Console
       CONSOLE_ENV="$CONSOLE_DIR/.env"
       cat > "$CONSOLE_ENV" << CONSOLEEOF
 CLAWDBOT_GATEWAY_URL=ws://127.0.0.1:18789
@@ -1595,12 +1595,12 @@ CONSOLEEOF
       chmod 600 "$CONSOLE_ENV"
 
       # Build for production
-      info "Building NanoFlow Console..."
+      info "Building ClawSuite Console..."
       (cd "$CONSOLE_DIR" && npm run build 2>&1 | tail -3) \
-        && success "NanoFlow Console built successfully" \
+        && success "ClawSuite Console built successfully" \
         || warn "Build failed — run 'npm run build' manually in $CONSOLE_DIR"
 
-      success "NanoFlow Console ready at $CONSOLE_DIR"
+      success "ClawSuite Console ready at $CONSOLE_DIR"
       info "Start with: cd $CONSOLE_DIR && HOST=0.0.0.0 PORT=3000 node server-entry.js"
     fi
   fi
