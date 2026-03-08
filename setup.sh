@@ -1707,6 +1707,54 @@ CONSOLEEOF
     fi
   fi
 
+  # ---- Memory Hybrid Plugin ----
+  echo ""
+  echo -e "${BOLD}--- Memory Hybrid Plugin ---${NC}"
+  echo ""
+  info "Installing memory-hybrid plugin (SQLite + LanceDB two-tier memory)..."
+  info "This gives your agent structured fact storage + semantic vector search."
+  echo ""
+
+  local EXTENSIONS_DIR
+  EXTENSIONS_DIR="$(npm root -g)/openclaw/extensions/memory-hybrid"
+
+  if [ -d "$EXTENSIONS_DIR" ] && [ -f "$EXTENSIONS_DIR/index.ts" ]; then
+    info "memory-hybrid already installed at $EXTENSIONS_DIR"
+  else
+    local SCRIPT_DIR
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local BUNDLED="$SCRIPT_DIR/extensions/memory-hybrid"
+
+    if [ -d "$BUNDLED" ] && [ -f "$BUNDLED/index.ts" ]; then
+      mkdir -p "$EXTENSIONS_DIR"
+      cp "$BUNDLED"/{package.json,openclaw.plugin.json,config.ts,index.ts} "$EXTENSIONS_DIR/"
+      success "memory-hybrid plugin files copied to $EXTENSIONS_DIR"
+    else
+      warn "Bundled memory-hybrid files not found. Plugin may not work."
+    fi
+  fi
+
+  # Install dependencies
+  if [ -d "$EXTENSIONS_DIR" ]; then
+    info "Installing memory-hybrid npm dependencies..."
+    (cd "$EXTENSIONS_DIR" && npm install --silent 2>&1 | tail -3) \
+      && success "memory-hybrid dependencies installed" \
+      || warn "npm install failed in $EXTENSIONS_DIR — run manually: cd $EXTENSIONS_DIR && npm install"
+
+    # Also install better-sqlite3 in the OpenClaw state dir
+    local OPENCLAW_STATE_DIR="$HOME/.openclaw"
+    if [ ! -f "$OPENCLAW_STATE_DIR/node_modules/better-sqlite3/build/Release/better_sqlite3.node" ]; then
+      info "Installing better-sqlite3 in $OPENCLAW_STATE_DIR..."
+      (cd "$OPENCLAW_STATE_DIR" && npm install better-sqlite3 --silent 2>&1 | tail -3) \
+        && success "better-sqlite3 installed" \
+        || warn "better-sqlite3 install failed — run: cd $OPENCLAW_STATE_DIR && npm install better-sqlite3"
+    fi
+
+    # Create memory directory
+    mkdir -p "$OPENCLAW_STATE_DIR/memory"
+    success "Memory directory ready: $OPENCLAW_STATE_DIR/memory"
+  fi
+
   # ---- Built-in Skills Activation ----
   echo ""
   echo -e "${GREEN}╔══════════════════════════════════════════════╗${NC}"
