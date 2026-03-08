@@ -779,6 +779,7 @@ if len(allow_agents) > 1:
 if llm_provider == "openai":
     config['models']['providers'] = {
         "openai": {
+            "baseUrl": "https://api.openai.com/v1",
             "apiKey": "${OPENAI_API_KEY}",
             "models": [
                 {"id": "gpt-4o", "name": "GPT-4o", "input": ["text", "image"], "contextWindow": 128000, "maxTokens": 16384},
@@ -791,6 +792,7 @@ if llm_provider == "openai":
 elif llm_provider == "anthropic":
     config['models']['providers'] = {
         "anthropic": {
+            "baseUrl": "https://api.anthropic.com",
             "apiKey": "${ANTHROPIC_API_KEY}",
             "models": [
                 {"id": "claude-sonnet-4-5-20250514", "name": "Claude Sonnet 4.5", "input": ["text", "image"], "contextWindow": 200000, "maxTokens": 16384}
