@@ -1656,7 +1656,8 @@ CONSOLEEOF
   if [[ "$INSTALL_CLAWMETRY" =~ ^[Yy] ]]; then
     if command -v pip &>/dev/null || command -v pip3 &>/dev/null; then
       PIP_CMD="$(command -v pip3 || command -v pip)"
-      "$PIP_CMD" install --break-system-packages clawmetry 2>/dev/null \
+      "$PIP_CMD" install --break-system-packages --ignore-installed clawmetry 2>/dev/null \
+        || "$PIP_CMD" install --break-system-packages clawmetry 2>/dev/null \
         || "$PIP_CMD" install --user clawmetry 2>/dev/null \
         || warn "Could not install clawmetry via pip. Install manually: pip install clawmetry"
       command -v clawmetry &>/dev/null && success "Clawmetry installed. Run: clawmetry" \
