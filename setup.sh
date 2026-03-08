@@ -168,6 +168,7 @@ preflight() {
   command -v python3 &>/dev/null || missing_pkgs="$missing_pkgs python3"
   command -v make &>/dev/null || missing_pkgs="$missing_pkgs build-essential"
   command -v pip3 &>/dev/null || missing_pkgs="$missing_pkgs python3-pip"
+  python3 -c "import ensurepip" &>/dev/null 2>&1 || missing_pkgs="$missing_pkgs python3-venv"
 
   if [ -n "$missing_pkgs" ]; then
     info "Installing dependencies:$missing_pkgs"
@@ -1052,6 +1053,13 @@ install_octave() {
     source "$OCTAVE_VENV/bin/activate" 2>/dev/null || true
     uv pip install octave-mcp 2>&1 | tail -1
   elif python3 -m venv --help &>/dev/null 2>&1; then
+    # Ensure python3-venv is available (Ubuntu/Debian need it separately)
+    if ! python3 -c "import ensurepip" &>/dev/null; then
+      info "Installing python3-venv (required for virtual environments)..."
+      apt-get install -y python3-venv 2>/dev/null \
+        || apt-get install -y "python3.$(python3 -c 'import sys;print(sys.version_info.minor)')-venv" 2>/dev/null \
+        || { warn "Could not install python3-venv. Run: sudo apt install python3-venv"; return; }
+    fi
     info "Installing OCTAVE via python3 venv..."
     python3 -m venv "$OCTAVE_VENV"
     "$OCTAVE_VENV/bin/pip" install --quiet octave-mcp 2>&1
