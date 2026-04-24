@@ -16,20 +16,16 @@ jobs:
 
       - name: Install and Fake Setup
         run: |
-          # 1. 全局安装工具
           npm install -g openclaw || true
-          
-          # 2. 伪造已安装状态和默认配置路径
           mkdir -p ~/.openclaw
+          # 伪造身份：指挥官
           echo '{"name":"指挥官","installed":true,"setupAt":"2026-04-24"}' > ~/.openclaw/state.json
-          
-          # 3. 【关键】：把配置直接塞进它的默认老家，不给它报错的机会
+          # 把配置塞进它唯一认的地方
           cp templates/openclaw.template.json ~/.openclaw/openclaw.json || true
-          cp templates/openclaw.template.json openclaw.json || true
 
       - name: Run
-        # 直接盲跑命令，它会自动去 ~/.openclaw/ 找配置
-        run: openclaw
+        # 核心修复：运行 gateway 命令来启动机器人
+        run: openclaw gateway
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
