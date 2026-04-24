@@ -14,28 +14,20 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install Force
+      - name: Pull Core Code
+        # 既然根目录没代码，我们直接强制下载最新内核
         run: |
-          # 1. 强制安装项目依赖和全局启动器
-          npm install || true
-          npm install -g pm2 || true
+          npm install -g openclaw
+          # 创建必要的配置目录
+          mkdir -p .openclaw
 
       - name: Prepare Config
-        run: |
-          # 2. 强制把你的配置模板同步到程序运行路径
-          mkdir -p .openclaw
-          cp templates/openclaw.template.json openclaw.json || true
+        # 把你改好的那个带有 System Prompt 的模板拷过去
+        run: cp templates/openclaw.template.json openclaw.json || true
 
-      - name: Start Directly
-        run: |
-          # 3. 绕过脚本，直接尝试各种可能的启动路径
-          if [ -f "dist/index.js" ]; then
-            node dist/index.js
-          elif [ -f "src/index.js" ]; then
-            node src/index.js
-          else
-            node index.js
-          fi
+      - name: Run
+        # 使用 openclaw 命令直接启动，避开所有交互提问
+        run: openclaw start --config openclaw.json
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
