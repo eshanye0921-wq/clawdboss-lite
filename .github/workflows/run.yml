@@ -14,19 +14,23 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install dependencies
-        # 跳过所有 setup 提问，直接安装必要的运行环境
-        run: npm install || true
-
-      - name: Prepare Config
-        # 强制把你的配置模板同步到程序运行路径
+      - name: Install and Start
         run: |
+          # 1. 安装基础依赖
+          npm install || true
+          
+          # 2. 强行把配置模板塞进正确位置
           mkdir -p .openclaw
           cp templates/openclaw.template.json openclaw.json || true
-
-      - name: Run
-        # 核心启动指令，对接你在 Secrets 填好的钥匙
-        run: node index.js
+          
+          # 3. 核心修复：自动回答所有安装提问并直接启动
+          # printf 命令会按顺序给脚本喂：回车(名字), 回车(Discord), 回车(更多)
+          # 然后直接接上启动命令
+          chmod +x setup.sh
+          printf "\n\n\n\n\n\n" | ./setup.sh --install || true
+          
+          # 4. 启动程序
+          bash setup.sh --start
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
