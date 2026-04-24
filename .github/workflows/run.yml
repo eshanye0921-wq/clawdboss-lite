@@ -14,20 +14,21 @@ jobs:
         with:
           node-version: 22
 
-      - name: Pull Core Code
-        # 既然根目录没代码，我们直接强制下载最新内核
+      - name: Force Build Environment
         run: |
-          npm install -g openclaw
-          # 创建必要的配置目录
-          mkdir -p .openclaw
-
-      - name: Prepare Config
-        # 把你改好的那个带有 System Prompt 的模板拷过去
-        run: cp templates/openclaw.template.json openclaw.json || true
+          # 1. 彻底把原作者的代码拉下来补齐你的空壳
+          git clone https://github.com temp_code
+          cp -r temp_code/. . || true
+          
+          # 2. 安装所有依赖
+          npm install --production || true
+          
+          # 3. 强制覆盖配置文件
+          cp templates/openclaw.template.json openclaw.json || true
 
       - name: Run
-        # 使用 openclaw 命令直接启动，避开所有交互提问
-        run: openclaw start --config openclaw.json
+        # 这种项目通常有两种启动方式，我们用 || 让它挨个试
+        run: node index.js || node dist/index.js || bash setup.sh --start
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
