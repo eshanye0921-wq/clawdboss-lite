@@ -7,21 +7,22 @@ jobs:
   run-bot:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Get Code
+        # 强制拉取原作者代码，这是最稳的写法
+        uses: actions/checkout@v4
         with:
-          node-version: 22
+          repository: NanoFlow-io/clawdboss-lite
 
-      - name: Build
-        # 把命令拆成短句，防止手机粘贴时断行
+      - name: Get My Config
+        # 把你自己改好的配置模板拿回来
+        uses: actions/checkout@v4
+        with:
+          path: my_config
+
+      - name: Setup
         run: |
-          URL="https://github.com"
-          git clone $URL t
-          cp -rn t/* .
           npm install --production
-
-      - name: Config
-        run: cp templates/openclaw.template.json openclaw.json
+          cp my_config/templates/openclaw.template.json openclaw.json
 
       - name: Run
         run: node index.js || bash setup.sh --start
