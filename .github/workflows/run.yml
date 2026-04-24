@@ -17,18 +17,24 @@ jobs:
         with:
           path: my_config
 
+      - name: Setup Node 22
+        # 强制安装程序要求的 Node.js 22 版本
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Setup and Run
         run: |
-          # 1. 暴力移动：不管代码在哪，通通拉到最外层
-          find . -maxdepth 3 -name "package.json" -exec sh -c 'cp -r $(dirname {})/. .' \; || true
+          # 1. 自动寻找代码位置并提取到根目录
+          find . -maxdepth 3 -name "package.json" -exec sh -c 'cp -rn $(dirname {})/. .' \; || true
           
-          # 2. 安装依赖
+          # 2. 安装运行环境
           npm install --production || true
           
-          # 3. 覆盖配置文件
+          # 3. 注入你的配置
           cp my_config/templates/openclaw.template.json openclaw.json || true
           
-          # 4. 强制启动
+          # 4. 启动
           node index.js || node dist/index.js || bash setup.sh --start
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
