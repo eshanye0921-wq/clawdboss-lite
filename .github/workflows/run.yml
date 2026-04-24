@@ -15,25 +15,18 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: |
-          # 忽略 npm 报错继续执行
-          npm install || true
-          if [ -f "setup.sh" ]; then
-            chmod +x setup.sh
-            # 关键修复：用 yes 命令自动回车跳过所有交互式提问
-            yes "" | ./setup.sh --install || true
-          fi
+        # 跳过所有 setup 提问，直接安装必要的运行环境
+        run: npm install || true
 
       - name: Prepare Config
+        # 强制把你的配置模板同步到程序运行路径
         run: |
-          # 确保根目录有配置文件，没有就从模板拷
-          if [ ! -f "openclaw.json" ]; then
-            cp templates/openclaw.template.json openclaw.json || true
-          fi
+          mkdir -p .openclaw
+          cp templates/openclaw.template.json openclaw.json || true
 
       - name: Run
-        # 启动程序
-        run: node index.js || bash setup.sh --start
+        # 核心启动指令，对接你在 Secrets 填好的钥匙
+        run: node index.js
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
