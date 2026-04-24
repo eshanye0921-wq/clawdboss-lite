@@ -16,20 +16,23 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # 忽略 npm 报错继续执行
           npm install || true
           if [ -f "setup.sh" ]; then
             chmod +x setup.sh
-            ./setup.sh --install
+            # 关键修复：用 yes 命令自动回车跳过所有交互式提问
+            yes "" | ./setup.sh --install || true
           fi
 
       - name: Prepare Config
         run: |
-          # 如果根目录没找到 openclaw.json，就从模板拷一个
+          # 确保根目录有配置文件，没有就从模板拷
           if [ ! -f "openclaw.json" ]; then
-            cp templates/openclaw.template.json openclaw.json
+            cp templates/openclaw.template.json openclaw.json || true
           fi
 
       - name: Run
+        # 启动程序
         run: node index.js || bash setup.sh --start
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
