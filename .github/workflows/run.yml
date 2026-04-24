@@ -16,19 +16,19 @@ jobs:
 
       - name: Install and Fake Setup
         run: |
-          # 1. 绕过源码，直接安装官方现成的运行工具
+          # 1. 全局安装
           npm install -g openclaw || true
           
-          # 2. 伪造“已安装”状态，跳过 Your name 提问
+          # 2. 伪造已安装状态（身份：指挥官）
           mkdir -p ~/.openclaw
           echo '{"name":"指挥官","installed":true,"setupAt":"2026-04-24"}' > ~/.openclaw/state.json
           
-          # 3. 把你改好的那个硬核 Prompt 模板同步过来
+          # 3. 准备配置
           cp templates/openclaw.template.json openclaw.json || true
 
       - name: Run
-        # 使用官方工具直接加载你的配置文件启动
-        run: openclaw start --config openclaw.json
+        # 修正启动命令：去掉 start，直接运行并指向配置文件
+        run: openclaw --config openclaw.json
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
