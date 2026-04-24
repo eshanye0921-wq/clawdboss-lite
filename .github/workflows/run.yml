@@ -8,29 +8,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Force Build Environment
-        # 修正了仓库地址，一行写完，确保能抓到代码
+      - name: Build
+        # 把命令拆成短句，防止手机粘贴时断行
         run: |
-          git clone https://github.com temp_code
-          cp -rn temp_code/* . || true
-          rm -rf temp_code
+          URL="https://github.com"
+          git clone $URL t
+          cp -rn t/* .
+          npm install --production
 
-      - name: Install dependencies
-        run: npm install --production || true
-
-      - name: Prepare Config
-        # 强制同步你的配置文件
-        run: cp templates/openclaw.template.json openclaw.json || true
+      - name: Config
+        run: cp templates/openclaw.template.json openclaw.json
 
       - name: Run
-        # 依次尝试可能的启动方式
-        run: node index.js || node dist/index.js || bash setup.sh --start
+        run: node index.js || bash setup.sh --start
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
