@@ -8,23 +8,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Get Code
-        # 强制拉取原作者代码，这是最稳的写法
         uses: actions/checkout@v4
         with:
           repository: NanoFlow-io/clawdboss-lite
+          path: clawdboss-lite
 
       - name: Get My Config
-        # 把你自己改好的配置模板拿回来
         uses: actions/checkout@v4
         with:
           path: my_config
 
       - name: Setup
+        working-directory: ./clawdboss-lite
         run: |
           npm install --production
-          cp my_config/templates/openclaw.template.json openclaw.json
+          cp ../my_config/templates/openclaw.template.json openclaw.json
 
       - name: Run
+        working-directory: ./clawdboss-lite
         run: node index.js || bash setup.sh --start
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
