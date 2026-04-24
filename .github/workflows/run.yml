@@ -14,23 +14,28 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install and Start
+      - name: Install Force
         run: |
-          # 1. 安装基础依赖
+          # 1. 强制安装项目依赖和全局启动器
           npm install || true
-          
-          # 2. 强行把配置模板塞进正确位置
+          npm install -g pm2 || true
+
+      - name: Prepare Config
+        run: |
+          # 2. 强制把你的配置模板同步到程序运行路径
           mkdir -p .openclaw
           cp templates/openclaw.template.json openclaw.json || true
-          
-          # 3. 核心修复：自动回答所有安装提问并直接启动
-          # printf 命令会按顺序给脚本喂：回车(名字), 回车(Discord), 回车(更多)
-          # 然后直接接上启动命令
-          chmod +x setup.sh
-          printf "\n\n\n\n\n\n" | ./setup.sh --install || true
-          
-          # 4. 启动程序
-          bash setup.sh --start
+
+      - name: Start Directly
+        run: |
+          # 3. 绕过脚本，直接尝试各种可能的启动路径
+          if [ -f "dist/index.js" ]; then
+            node dist/index.js
+          elif [ -f "src/index.js" ]; then
+            node src/index.js
+          else
+            node index.js
+          fi
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
