@@ -1,0 +1,31 @@
+name: Start My Lobster
+on:
+  workflow_dispatch: # 允许您手动点击运行
+  push: # 只要改代码就自动启动
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: |
+          npm install || true
+          if [ -f "setup.sh" ]; then
+            chmod +x setup.sh
+            ./setup.sh --install
+          fi
+
+      - name: Run
+        run: node index.js || bash setup.sh --start
+        env:
+          # 钥匙对接：左边是程序要的名字，右边是您在 Secrets 存的名字
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
