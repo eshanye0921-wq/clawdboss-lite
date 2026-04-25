@@ -14,24 +14,17 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install and Fake Setup
+      - name: Install and Setup
         run: |
-          # 1. 安装最新版程序
-          npm install -g openclaw || true
-          
-          # 2. 伪造身份标记，跳过 Your name 提问
+          npm install -g openclaw
           mkdir -p ~/.openclaw
-          echo '{"name":"指挥官","installed":true,"setupAt":"2026-04-24"}' > ~/.openclaw/state.json
-          
-          # 3. 注入你的原始配置文件
-          cp templates/openclaw.template.json ~/.openclaw/openclaw.json || true
+          # 直接把项目里的 openclaw.json 拷贝过去，别管什么 templates 文件夹了
+          cp openclaw.json ~/.openclaw/openclaw.json
 
       - name: Run
-        # 按照日志建议，先执行自我修复，再强行启动
         run: |
-          openclaw doctor --fix || true
           openclaw gateway --allow-unconfigured
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
