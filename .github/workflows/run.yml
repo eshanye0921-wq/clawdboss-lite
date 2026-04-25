@@ -18,7 +18,6 @@ jobs:
         run: |
           npm install -g openclaw
           mkdir -p ~/.openclaw
-          # 直接把项目里的 openclaw.json 拷贝过去，别管什么 templates 文件夹了
           cp openclaw.json ~/.openclaw/openclaw.json
 
       - name: Run
@@ -27,4 +26,4 @@ jobs:
         env:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
